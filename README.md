@@ -12,6 +12,8 @@ Aplicação web que encontra excertos de regulamentos públicos da UBI e mostra 
 
 Ainda não usa um modelo de IA: mostra os excertos relevantes, sem redigir respostas.
 
+Este projeto foi feito com a ajuda de um assistente de IA (Claude).
+
 ## Correr localmente
 
 ```
