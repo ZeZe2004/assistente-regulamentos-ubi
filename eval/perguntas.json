@@ -1,0 +1,9 @@
+[
+ {"pergunta": "Há limite de exames de recurso?", "documento": "ubi-regulamento-academico.pdf", "termo": "exame de recurso"},
+ {"pergunta": "Como posso creditar disciplinas?", "documento": "ubi-regulamento-creditacao.pdf", "termo": "credita"},
+ {"pergunta": "Quais as prestações das propinas?", "documento": "ubi-regulamento-propinas.pdf", "termo": "presta"},
+ {"pergunta": "A experiência profissional pode ser creditada?", "documento": "ubi-regulamento-creditacao.pdf", "termo": "experi"},
+ {"pergunta": "O que acontece se copiar num exame?", "documento": "ubi-regulamento-academico.pdf", "termo": "disciplinar"},
+ {"pergunta": "Quem paga propinas em dupla titulação?", "documento": "ubi-regulamento-propinas.pdf", "termo": "dupla titula"},
+ {"pergunta": "Qual é a receita do bacalhau à brás?", "documento": null, "termo": null}
+]

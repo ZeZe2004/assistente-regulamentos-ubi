@@ -6,6 +6,8 @@ const SOURCES: Record<string, { title: string; url: string }> = {
   'ubi-regulamento-creditacao.pdf': { title: 'Regulamento de Creditação', url: 'https://www.ubi.pt/Ficheiros/Sites/53/Paginas/399/Despachos/2022/regulamento_creditacao_ubi.pdf' },
   'ubi-regulamento-propinas.pdf': { title: 'Regulamento de Propinas, alteração de 2020', url: 'https://files.diariodarepublica.pt/2s/2020/02/029000000/0021600225.pdf' },
 }
+const API_URL: string | undefined = import.meta.env.VITE_API_URL
+interface Answer { resposta: string }
 const EXAMPLES = ['Como funciona o exame de recurso?', 'Como posso creditar disciplinas?', 'Quais as prestações das propinas?']
 
 export default function App() {
@@ -13,6 +15,8 @@ export default function App() {
   const [failed, setFailed] = useState(false)
   const [question, setQuestion] = useState('')
   const [asked, setAsked] = useState('')
+  const [answer, setAnswer] = useState<Answer | null>(null)
+  const [answerFailed, setAnswerFailed] = useState(false)
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}index.json`)
@@ -23,6 +27,23 @@ export default function App() {
 
   const index = useMemo(() => (excerpts ? new SearchIndex(excerpts) : null), [excerpts])
   const results: Result[] = useMemo(() => (index && asked ? index.search(asked) : []), [index, asked])
+  useEffect(() => {
+    setAnswer(null)
+    setAnswerFailed(false)
+    if (!API_URL || !asked) return
+    const controller = new AbortController()
+    fetch(`${API_URL}/api/perguntar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pergunta: asked }),
+      signal: controller.signal,
+    })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then(setAnswer)
+      .catch((e: Error) => { if (e.name !== 'AbortError') setAnswerFailed(true) })
+    return () => controller.abort()
+  }, [asked])
+
   const submit = (e: FormEvent) => { e.preventDefault(); setAsked(question.trim()) }
   const ask = (q: string) => { setQuestion(q); setAsked(q) }
 
@@ -40,6 +61,8 @@ export default function App() {
       </form>
       <div className="examples">{EXAMPLES.map((q) => <button key={q} type="button" onClick={() => ask(q)}>{q}</button>)}</div>
       {failed && <p role="alert">Não foi possível carregar os documentos. Tenta recarregar a página.</p>}
+      {answer && <section className="answer"><h2>Resposta</h2><p>{answer.resposta}</p></section>}
+      {answerFailed && <p role="alert">A resposta com IA falhou, mas os excertos continuam abaixo.</p>}
       {asked && index && results.length === 0 && <p className="empty">Não encontrei isto nos documentos.</p>}
       <ol className="results">
         {results.map(({ excerpt }) => {

@@ -12,3 +12,4 @@ button:disabled { opacity:.5; cursor:default; }
 .examples { display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 28px; } .examples button { background:none; color:var(--accent); border:1px solid var(--line); font-weight:500; font-size:14px; min-height:36px; padding:0 12px; }
 .results { list-style:none; padding:0; margin:0; display:grid; gap:12px; } .results li { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:16px; }
 .results p { margin:0 0 10px; line-height:1.5; } a { color:var(--accent); font-weight:600; } .empty { font-weight:600; } footer { margin-top:32px; border-top:1px solid var(--line); padding-top:16px; }
+.answer { margin-bottom:16px; padding:16px; border:2px solid var(--accent); border-radius:8px; background:var(--card); } .answer h2 { margin:0 0 8px; font-size:16px; } .answer p { margin:0; line-height:1.5; }

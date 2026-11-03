@@ -20,7 +20,8 @@ EXCERTOS = [
 
 class Testes(unittest.TestCase):
     def test_acentos(self):
-        self.assertEqual(tokens("Época de Recurso"), ["epoca", "recurso"])
+        self.assertEqual(tokens("Época de Recurso"), tokens("epoca recurso"))
+        self.assertEqual(tokens("creditar"), tokens("creditação"))
 
     def test_encontra_excerto_e_fonte(self):
         _, melhor = Indice(EXCERTOS).pesquisar("Quando se pagam as propinas?")[0]

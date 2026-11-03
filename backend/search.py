@@ -7,14 +7,24 @@ import unicodedata
 from collections import Counter
 from pathlib import Path
 
-PARAGENS = set("a ao aos as com como da das de do dos e em na nas no nos o os ou para pela pelo por que se um uma".split())
+PARAGENS = set("a ao aos as com como da das de do dos e em na nas no nos o os ou para pela pelo por que se um uma quando qual quais posso pode".split())
+SUFIXOS = ["acoes", "acao", "adores", "ador", "ados", "adas", "ado", "ada", "ando", "endo", "arem", "ar", "er", "ir", "am", "em", "as", "es", "os", "a", "e", "o", "s"]
 K1, B = 1.5, 0.75
+
+
+def raiz(palavra):
+    """Reduz a palavra a raiz, para "creditar" e "creditacao" coincidirem."""
+    for sufixo in SUFIXOS:
+        if palavra.endswith(sufixo) and len(palavra) - len(sufixo) >= 4:
+            return palavra[: -len(sufixo)]
+    return palavra
 
 
 def tokens(texto):
     sem_acentos = unicodedata.normalize("NFKD", texto.lower())
     sem_acentos = "".join(c for c in sem_acentos if not unicodedata.combining(c))
-    return [t for t in re.findall(r"[a-z0-9]+", sem_acentos) if t not in PARAGENS]
+    sem_acentos = re.sub(r"-\s+", "", sem_acentos)
+    return [raiz(t) for t in re.findall(r"[a-z0-9]+", sem_acentos) if t not in PARAGENS]
 
 
 class Indice:
@@ -27,24 +37,28 @@ class Indice:
 
     def pesquisar(self, pergunta, quantos=3):
         total = len(self.excertos)
+        termos = list(dict.fromkeys(tokens(pergunta)))
         resultados = []
         for i, contagem in enumerate(self.contagens):
             pontos = 0.0
-            for termo in tokens(pergunta):
+            encontrados = 0
+            for termo in termos:
                 freq = contagem[termo]
                 if not freq:
                     continue
+                encontrados += 1
                 n = self.presencas[termo]
                 idf = math.log(1 + (total - n + 0.5) / (n + 0.5))
                 pontos += idf * freq * (K1 + 1) / (freq + K1 * (1 - B + B * self.tamanhos[i] / self.media))
             if pontos > 0:
-                resultados.append((pontos, self.excertos[i]))
+                # Favorece excertos que cobrem mais termos da pergunta.
+                resultados.append((pontos * encontrados / len(termos), self.excertos[i]))
         resultados.sort(key=lambda r: r[0], reverse=True)
         return resultados[:quantos]
 
 
 if __name__ == "__main__":
     pergunta = " ".join(sys.argv[1:]) or sys.exit('Uso: python backend/search.py "a tua pergunta"')
-    dados = json.loads(Path("data/index.json").read_text(encoding="utf-8"))
+    dados = json.loads(Path("frontend/public/index.json").read_text(encoding="utf-8"))
     for pontos, e in Indice(dados).pesquisar(pergunta):
         print(f"[{pontos:.2f}] {e['documento']}, p. {e['pagina']}\n{e['texto'][:300]}...\n")
