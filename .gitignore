@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+data/index.json
+node_modules/
+dist/
+data/pdfs/
